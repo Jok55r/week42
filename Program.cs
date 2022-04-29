@@ -4,8 +4,8 @@ namespace week42
 {
     internal class Program
     {
-        static int width = 12;
-        static int height = 23;
+        public const int width = 12;
+        public const int height = 23;
         static char[,] field = new char[height, width];
 
         static bool xCordinatsNow = true;
@@ -23,6 +23,8 @@ namespace week42
 
         static char[] nums = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
 
+        static bool yourTurn = true;
+
         static void Main(string[] args)
         {
             MakeField();
@@ -32,7 +34,26 @@ namespace week42
                 DrawField();
                 ChooseCordinats();
                 BotHitYou();
+                CheckIfEnd();
                 xCordinatsNow = !xCordinatsNow;
+            }
+        }
+
+        static void CheckIfEnd()
+        {
+            if (needToWin == 0)
+            {
+                Console.WriteLine();
+                Console.WriteLine("---You Win---");
+                Console.ReadLine();
+                Restart();
+            }
+            if (needToLose == 0)
+            {
+                Console.ReadLine();
+                Console.WriteLine("---You Lose---");
+                Console.ReadLine();
+                Restart();
             }
         }
 
@@ -56,9 +77,10 @@ namespace week42
 
         static void BotHitYou()
         { 
-            if (!xCordinatsNow)
+            while (!yourTurn)
             {
                 Random rnd = new Random();
+                bool hitBoat = false;
                 bool hitAnything = false;
                 for(; !hitAnything;)
                 {
@@ -73,16 +95,12 @@ namespace week42
                     else if (shipCorr[yRand, xRand] == 1)
                     {
                         shipCorr[yRand, xRand] = 5;
+                        hitBoat = true;
                         hitAnything = true;
                         needToLose--;
                     }
                 }
-            }
-            if (needToLose == 0)
-            {
-                Console.ReadLine();
-                Console.WriteLine("---You Lose---");
-                Restart();
+                if (!hitBoat) yourTurn = true;
             }
         }
 
@@ -115,16 +133,13 @@ namespace week42
             if (shipCorr[yChoose, xChoose] == 1)
             {
                 shipCorr[yChoose, xChoose] = 3;
-                needToWin++;
-                if (needToWin == 0)
-                {
-                    Console.WriteLine();
-                    Console.WriteLine("---You Win---");
-                    Console.ReadLine();
-                    Restart();
-                }
+                needToWin--;
             }
-            else { shipCorr[yChoose + 1, xChoose + 1] = 2; }
+            else 
+            { 
+                shipCorr[yChoose + 1, xChoose + 1] = 2;
+                yourTurn = false;
+            }
         }
 
         static void MakeField()
