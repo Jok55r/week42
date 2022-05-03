@@ -4,10 +4,10 @@ namespace week42
 {
     public enum Pixel
     {
-        iShot = (char)250, //'·'
-        iHit = (char)88, //'X'
-        heShot = (char)250, //'·'
-        heHit = (char)177 //'░'
+        iShot = '·',
+        iHit = 'X',
+        heShot = '·',
+        heHit = '░'
     }
     internal class Program
     {
