@@ -30,6 +30,7 @@ namespace Warship
             if (firstPlayer.ships == 0) Console.WriteLine("---second player wins!---");
             else  Console.WriteLine("---first player wins!---");
             Console.ReadLine();
+            Main(new string[0]);
         }
         static void HitSomething(Player currentPlayer, Player opponentPlayer, char[,] field, bool isSecondPlayer)
         {
