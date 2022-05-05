@@ -1,175 +1,117 @@
 ﻿using System;
 
-namespace week42
+namespace Warship
 {
-    public enum Pixel
+    class Player
     {
-        iShot = '·',
-        iHit = 'X',
-        heShot = '·',
-        heHit = '░'
+        public byte ships = 0;
+        public bool itsTurn = true;
+        public byte needsToPlace = 10;
     }
+
     internal class Program
     {
-        public const int width = 12, height = 23;
-        static bool xCordinatsNow = true;
-        static bool yourTurn = true;
-
-        static sbyte howManyMyShips = 10, howManyOppShips = 10;
-        static sbyte needToWin = 10, needToLose = 10;
-
-        static sbyte xChoose = 0, yChoose = 0;
-
-        static char[,] field = new char[height, width];
-        static int[,] shipCorr = new int[height, width];
-
+        public const byte players = 2;
+        public const byte height = 23;
+        public const byte width = 12;
         static void Main(string[] args)
         {
-            MakeField();
-            while(true)
+            Player firstPlayer = new Player();
+            Player secondPlayer = new Player();
+            char[,] field = MakeScreen(firstPlayer, secondPlayer);
+
+            while (!EndGame(firstPlayer, secondPlayer))
             {
-                Console.Clear();
-                DrawField();
-                ChooseCordinats();
-                BotHitYou();
-                CheckIfEnd();
+                DrawScreen(field);
+                if (firstPlayer.itsTurn) HitSomething(firstPlayer, secondPlayer, field, false);
+                else if (secondPlayer.itsTurn) HitSomething(secondPlayer, firstPlayer, field, true);
             }
+            Console.WriteLine();
+            if (firstPlayer.ships == 0) Console.WriteLine("---second player wins!---");
+            else  Console.WriteLine("---first player wins!---");
+            Console.ReadLine();
         }
-        static void CheckIfEnd()
+        static void HitSomething(Player currentPlayer, Player opponentPlayer, char[,] field, bool isSecondPlayer)
         {
-            if (needToWin == 0 || needToLose == 0)
+            currentPlayer.itsTurn = false;
+
+            if (Console.ReadLine()[0] == 'r') Main(new string[0]);
+            char[] abcs = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j' };
+            byte xCor = (byte)(Console.ReadLine()[1] - 47);
+            byte yCor = 0;
+
+            if (isSecondPlayer) xCor += 11;
+            for (byte i = 0; i < abcs.Length; i++) if (abcs[i] == Console.ReadLine()[0]) yCor = (byte)(i + 1);
+
+            for (byte i = 1; i < field.GetLength(0) - 1; i++)
             {
-                Console.WriteLine();
-                if (needToWin == 0)
-                    Console.WriteLine("---You Win---");
-                else
-                    Console.WriteLine("---You Lose---");
-                Console.ReadLine();
-                Restart();
-            }
-        }
-        static void Restart()
-        {
-            Array.Clear(shipCorr, 0, shipCorr.Length);
-            xCordinatsNow = true;
-            xChoose = 0;
-            yChoose = 0;
-            needToWin = 10;
-            howManyOppShips = 10;
-            howManyMyShips = 10;
-            MakeField();
-        }
-        static void BotHitYou()
-        { 
-            while (!yourTurn)
-            {
-                Random rnd = new Random();
-                bool hitBoat = false;
-                bool hitAnything = false;
-                for(; !hitAnything;)
+                for (byte j = 1; j < field.GetLength(1) - 1; j++)
                 {
-                    int xRand = rnd.Next(1, 11);
-                    int yRand = rnd.Next(12, 22);
-                
-                    if (shipCorr[yRand, xRand] == 0)
-                    {
-                        shipCorr[yRand, xRand] = 4;
-                        hitAnything = true;
+                    if (i == yCor && j == xCor && field[i, j] == ' ') {
+                        field[i, j] = 'O';
+                        opponentPlayer.itsTurn = true;
+                        i = (byte)(field.GetLength(0) - 1);
+                        break;
                     }
-                    else if (shipCorr[yRand, xRand] == 1)
-                    {
-                        shipCorr[yRand, xRand] = 5;
-                        hitBoat = true;
-                        hitAnything = true;
-                        needToLose--;
+                    else if (i == yCor && j == xCor && field[i, j] == '*') {
+                        field[i, j] = 'X';
+                        currentPlayer.itsTurn = true;
+                        opponentPlayer.ships--;
+                        i = (byte)(field.GetLength(0) - 1);
+                        break;
                     }
                 }
-                if (!hitBoat) yourTurn = true;
             }
         }
-        static void ChooseCordinats()
+        static void DrawScreen(char[,] field)
         {
-            char input = Console.ReadKey().KeyChar;
-
-            if (input == 'r') Restart();
-
-            else if ((int)input >= '0' && (int)input <= '9')
+            Console.Clear();
+            for (byte i = 0; i < field.GetLength(0); i++)
             {
-                if (xCordinatsNow)
-                    xChoose = (sbyte)(input - 48);
-
-                else {
-                    yChoose = (sbyte)(input - 48);
-                    hitSomething();
-                }
-                xCordinatsNow = !xCordinatsNow;
+                for (byte j = 0; j < field.GetLength(1); j++) Console.Write(field[i, j]);
+                Console.WriteLine();
             }
         }
-        static void hitSomething()
+        static bool EndGame(Player firstPlayer, Player secondPlayer)
         {
-            yChoose++;
-            xChoose++;
-            if (shipCorr[yChoose, xChoose] == 1) 
-            {
-                shipCorr[yChoose, xChoose] = 3;
-                needToWin--;
-            }
-            else { 
-                shipCorr[yChoose, xChoose] = 2;
-                yourTurn = false;
-            }
+            if (firstPlayer.ships == 0 || secondPlayer.ships == 0) return true;
+            return false;
         }
-        static void MakeField()
+        static char[,] MakeScreen(Player firstPlayer, Player secondPlayer)
         {
             Random rnd = new Random();
-            for (int i = 0; i < height; i++)
+            char[,] field = new char[width, height];
+            char[] nums = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+            char[] abcs = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j' };
+            for (byte i = 0; i < width; i++)
             {
-                for (int j = 0; j < width; j++)
+                for (byte j = 0; j < height; j++)
                 {
-                    if (rnd.Next(0, 7) == 1 && howManyMyShips > 0 && i > height - 11 && i < height - 1 && j > 0 && j < width - 1){
-                        field[i, j] = '▓';
-                        shipCorr[i, j] = 1;
-                        howManyMyShips--;
+                    if ((i == width - 1 || i == 0) && j > 0 && j < 11)
+                        field[i, j] = nums[j - 1];
+
+                    else if ((i == width - 1 || i == 0) && j > 11 && j < 22)
+                        field[i, j] = nums[j - 12];
+
+                    else if ((j == 0 || j == height - 1 ||j == 11) && i > 0 && i < 11)
+                        field[i, j] = abcs[i - 1];
+
+                    else if (j < 11 && rnd.Next(0, 7) == 0 && firstPlayer.needsToPlace >= firstPlayer.ships)
+                    {
+                        field[i, j] = '*';
+                        firstPlayer.ships++;
                     }
-                    else if (rnd.Next(0, 7) == 1 && howManyOppShips > 0 && i < height - 12 && i > 0 && j > 0 && j < width - 1){
-                        howManyOppShips--;
-                        shipCorr[i, j] = 1;
+
+                    else if (j > 11 && rnd.Next(0, 7) == 0 && secondPlayer.needsToPlace >= secondPlayer.ships)
+                    {
+                        field[i, j] = '*';
+                        secondPlayer.ships++;
                     }
+
                     else field[i, j] = ' ';
                 }
             }
-        }
-        static void DrawField()
-        {
-            char[] nums = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
-            for (int i = 0; i < height; i++)
-            {
-                for (int j = 0; j < width; j++)
-                {
-                    if (i == 0 || j == 0 || i == height - 1 || j == width - 1 || i == 11)
-                        field[i, j] = '█';
-                    else if ( i < 12)
-                        field[i, j] = '▒';
-
-                    PlacePixel(i, j);
-
-                    if (xCordinatsNow && j > 0 && j < width - 1 && i == 0)
-                        field[i, j] = nums[j - 1];
-                    else if (!xCordinatsNow && i > 0 && i < 11 && j == 0)
-                        field[i, j] = nums[i - 1];
-
-                    Console.Write((char)field[i, j]);
-                }
-                Console.WriteLine();
-            }
-        }
-        static void PlacePixel(int i, int j)
-        {
-            for (int n = 0; n < 4; n++)
-            {
-                if (shipCorr[i, j] == n + 2)
-                    field[i, j] = (char)(Pixel)n;
-            }
+            return field;
         }
     }
 }
