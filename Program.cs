@@ -36,13 +36,14 @@ namespace Warship
         {
             currentPlayer.itsTurn = false;
 
-            if (Console.ReadLine()[0] == 'r') Main(new string[0]);
-            char[] abcs = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j' };
-            byte xCor = (byte)(Console.ReadLine()[1] - 47);
+            string input = Console.ReadLine();
+            if (input[0] == 'r') Main(new string[0]);
+            string abcs = "abcdefghij";
+            byte xCor = (byte)(input[1] - 47);
             byte yCor = 0;
 
             if (isSecondPlayer) xCor += 11;
-            for (byte i = 0; i < abcs.Length; i++) if (abcs[i] == Console.ReadLine()[0]) yCor = (byte)(i + 1);
+            for (byte i = 0; i < abcs.Length; i++) if (abcs[i] == input[0]) yCor = (byte)(i + 1);
 
             for (byte i = 1; i < field.GetLength(0) - 1; i++)
             {
@@ -82,8 +83,8 @@ namespace Warship
         {
             Random rnd = new Random();
             char[,] field = new char[width, height];
-            char[] nums = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
-            char[] abcs = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j' };
+            string nums = "0123456789";
+            string abcs = "abcdefghij";
             for (byte i = 0; i < width; i++)
             {
                 for (byte j = 0; j < height; j++)
@@ -97,14 +98,12 @@ namespace Warship
                     else if ((j == 0 || j == height - 1 ||j == 11) && i > 0 && i < 11)
                         field[i, j] = abcs[i - 1];
 
-                    else if (j < 11 && rnd.Next(0, 7) == 0 && firstPlayer.needsToPlace >= firstPlayer.ships)
-                    {
+                    else if (j < 11 && rnd.Next(0, 7) == 0 && firstPlayer.needsToPlace >= firstPlayer.ships) {
                         field[i, j] = '*';
                         firstPlayer.ships++;
                     }
 
-                    else if (j > 11 && rnd.Next(0, 7) == 0 && secondPlayer.needsToPlace >= secondPlayer.ships)
-                    {
+                    else if (j > 11 && rnd.Next(0, 7) == 0 && secondPlayer.needsToPlace >= secondPlayer.ships) {
                         field[i, j] = '*';
                         secondPlayer.ships++;
                     }
