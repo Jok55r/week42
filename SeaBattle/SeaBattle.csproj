@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{5FE13D9E-8742-45A5-8C86-22961EF38926}</ProjectGuid>
+    <ProjectGuid>{17920FCB-A4A8-48D3-A257-487D84AC4D5B}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>Warship</RootNamespace>
-    <AssemblyName>Warship</AssemblyName>
+    <RootNamespace>SeaBattle</RootNamespace>
+    <AssemblyName>SeaBattle</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -43,11 +43,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Field.cs" />
-    <Compile Include="Game.cs" />
     <Compile Include="Lobby.cs" />
-    <Compile Include="Pixels.cs" />
+    <Compile Include="Game.cs" />
     <Compile Include="Player.cs" />
+    <Compile Include="GameIcons.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
